@@ -11,6 +11,14 @@ interface CoachAIResponse {
   }>;
 }
 
+function cleanOpenAIOutput(text: string): string {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/^\s+|\s+$/g, '')
+    .trim();
+}
+
 export async function getCoachingMessage(userMessage: string): Promise<string> {
   try {
     const response = await fetch("https://cardscoutai.app.n8n.cloud/webhook/coach-ai", {
@@ -26,7 +34,8 @@ export async function getCoachingMessage(userMessage: string): Promise<string> {
     const data: CoachAIResponse = await response.json();
 
     if (data.output && data.output.length > 0 && data.output[0].content && data.output[0].content.length > 0) {
-      return data.output[0].content[0].text;
+      const rawText = data.output[0].content[0].text;
+      return cleanOpenAIOutput(rawText);
     }
 
     throw new Error("Unexpected response format");

@@ -145,16 +145,16 @@ export function CoachingMoment({ onBack, onNext }: CoachingMomentProps) {
               </div>
             </div>
           ) : (
-            <p
+            <div
               style={{
                 fontSize: '18px',
                 fontWeight: 400,
                 color: '#0B162A',
                 lineHeight: '1.6',
+                whiteSpace: 'pre-line',
               }}
-            >
-              {coachingMessage}
-            </p>
+              dangerouslySetInnerHTML={{ __html: coachingMessage }}
+            />
           )}
         </div>
 
