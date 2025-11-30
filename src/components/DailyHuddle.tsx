@@ -9,9 +9,10 @@ interface DailyHuddleProps {
   onStartCoaching: () => void;
   onViewTracks: () => void;
   onViewProgress: () => void;
+  onCreateScenario: () => void;
 }
 
-export function DailyHuddle({ onLogoClick, onStartCoaching, onViewTracks, onViewProgress }: DailyHuddleProps) {
+export function DailyHuddle({ onLogoClick, onStartCoaching, onViewTracks, onViewProgress, onCreateScenario }: DailyHuddleProps) {
   const { userDay } = useAppContext();
   return (
     <div 
@@ -191,6 +192,29 @@ export function DailyHuddle({ onLogoClick, onStartCoaching, onViewTracks, onView
               }}
             >
               Start Coaching
+            </button>
+
+            <button
+              onClick={onCreateScenario}
+              className="w-full transition-all"
+              style={{
+                height: '56px',
+                backgroundColor: '#C83803',
+                borderRadius: '14px',
+                color: '#FFFFFF',
+                fontSize: '18px',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#A02F02';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#C83803';
+              }}
+            >
+              Create Practice Scenario
             </button>
             
             <div 

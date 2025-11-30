@@ -7,8 +7,9 @@ import { TrackDetail } from './components/TrackDetail';
 import { ProgressOverview } from './components/ProgressOverview';
 import { CoachingSummary } from './components/CoachingSummary';
 import { LessonPlayer } from './components/LessonPlayer';
+import { ScenarioCreator } from './components/ScenarioCreator';
 
-type Screen = 'onboarding' | 'dashboard' | 'coaching' | 'track' | 'progress' | 'summary' | 'lesson';
+type Screen = 'onboarding' | 'dashboard' | 'coaching' | 'track' | 'progress' | 'summary' | 'lesson' | 'scenario';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('onboarding');
@@ -25,6 +26,7 @@ export default function App() {
           onStartCoaching={() => setCurrentScreen('coaching')}
           onViewTracks={() => setCurrentScreen('track')}
           onViewProgress={() => setCurrentScreen('progress')}
+          onCreateScenario={() => setCurrentScreen('scenario')}
         />
       )}
 
@@ -57,6 +59,12 @@ export default function App() {
         <LessonPlayer
           onBack={() => setCurrentScreen('track')}
           onComplete={() => setCurrentScreen('track')}
+        />
+      )}
+
+      {currentScreen === 'scenario' && (
+        <ScenarioCreator
+          onBack={() => setCurrentScreen('dashboard')}
         />
       )}
     </AppProvider>
