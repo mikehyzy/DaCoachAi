@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { DitkaLogoSmall } from './DitkaLogoSmall';
 import { SkeletonLoader } from './SkeletonLoader';
 import { ProgressBar } from './ProgressBar';
+import { getCoachingMessage } from '../services/coachAI';
 
 interface CoachingMomentProps {
   onBack: () => void;
@@ -13,18 +14,32 @@ interface CoachingMomentProps {
 export function CoachingMoment({ onBack, onNext }: CoachingMomentProps) {
   const { userDay, getSessionProgress, toggleFocusItemComplete } = useAppContext();
   const [isLoading, setIsLoading] = useState(true);
+  const [coachingMessage, setCoachingMessage] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const progress = getSessionProgress();
 
   useEffect(() => {
-    // Simulate AI loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    const fetchCoachingMessage = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-    return () => clearTimeout(timer);
-  }, []);
+        const focusAreas = userDay.focusItems.map(item => item.title).join(', ');
+        const userInput = `I have ${userDay.energyLevel}/10 energy today and I'm focusing on: ${focusAreas}. Give me coaching advice.`;
 
-  const coachingMessage = "Listen up. You've got the energy and the drive today. Don't waste it on distractions. Focus on mastering strategy first—that's your foundation. Build on that with AI skills, then lead with confidence. You're not here to play small. Execute with precision, stay accountable, and own your progress. Let's go.";
+        const message = await getCoachingMessage(userInput);
+        setCoachingMessage(message);
+      } catch (err) {
+        console.error('Failed to fetch coaching message:', err);
+        setError('Unable to load coaching message. Please try again.');
+        setCoachingMessage("Listen up. You've got the energy and the drive today. Don't waste it on distractions. Focus on mastering strategy first—that's your foundation. Build on that with AI skills, then lead with confidence. You're not here to play small. Execute with precision, stay accountable, and own your progress. Let's go.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCoachingMessage();
+  }, [userDay.energyLevel, userDay.focusItems]);
 
   return (
     <div 
@@ -102,7 +117,7 @@ export function CoachingMoment({ onBack, onNext }: CoachingMomentProps) {
             marginBottom: '32px',
           }}
         >
-          <div 
+          <div
             style={{
               fontSize: '14px',
               fontWeight: 500,
@@ -114,11 +129,23 @@ export function CoachingMoment({ onBack, onNext }: CoachingMomentProps) {
           >
             DA COACH AI
           </div>
-          
+
           {isLoading ? (
             <SkeletonLoader />
+          ) : error ? (
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <AlertCircle size={20} style={{ color: '#EF4444', flexShrink: 0, marginTop: '2px' }} />
+              <div>
+                <p style={{ fontSize: '16px', fontWeight: 500, color: '#EF4444', marginBottom: '8px' }}>
+                  {error}
+                </p>
+                <p style={{ fontSize: '18px', fontWeight: 400, color: '#0B162A', lineHeight: '1.6' }}>
+                  {coachingMessage}
+                </p>
+              </div>
+            </div>
           ) : (
-            <p 
+            <p
               style={{
                 fontSize: '18px',
                 fontWeight: 400,
