@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 import { DitkaLogoSmall } from './DitkaLogoSmall';
 import { SkeletonLoader } from './SkeletonLoader';
 import { ProgressBar } from './ProgressBar';
@@ -10,8 +11,9 @@ interface CoachingMomentProps {
 }
 
 export function CoachingMoment({ onBack, onNext }: CoachingMomentProps) {
+  const { userDay, getSessionProgress, toggleFocusItemComplete } = useAppContext();
   const [isLoading, setIsLoading] = useState(true);
-  const [progress] = useState(33);
+  const progress = getSessionProgress();
 
   useEffect(() => {
     // Simulate AI loading
@@ -23,12 +25,6 @@ export function CoachingMoment({ onBack, onNext }: CoachingMomentProps) {
   }, []);
 
   const coachingMessage = "Listen up. You've got the energy and the drive today. Don't waste it on distractions. Focus on mastering strategy first—that's your foundation. Build on that with AI skills, then lead with confidence. You're not here to play small. Execute with precision, stay accountable, and own your progress. Let's go.";
-
-  const focusItems = [
-    "Master Strategy - Complete strategic planning framework",
-    "AI Mastery - Study machine learning fundamentals",
-    "Product Leadership - Review team alignment session"
-  ];
 
   return (
     <div 
@@ -136,7 +132,7 @@ export function CoachingMoment({ onBack, onNext }: CoachingMomentProps) {
         </div>
 
         {/* Section 3: Focus for Today */}
-        <div 
+        <div
           style={{
             backgroundColor: '#FFFFFF',
             borderRadius: '16px',
@@ -145,33 +141,82 @@ export function CoachingMoment({ onBack, onNext }: CoachingMomentProps) {
             marginBottom: '32px',
           }}
         >
-          <h2 
+          <h2
             style={{
               fontSize: '18px',
               fontWeight: 700,
               color: '#0B162A',
-              marginBottom: '12px',
+              marginBottom: '16px',
             }}
           >
             Your Focus Today
           </h2>
-          
-          <ul style={{ margin: 0, paddingLeft: '20px' }}>
-            {focusItems.map((item, index) => (
-              <li 
-                key={index}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {userDay.focusItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => toggleFocusItemComplete(item.id)}
                 style={{
-                  fontSize: '16px',
-                  fontWeight: 400,
-                  color: '#0B162A',
-                  lineHeight: '1.6',
-                  marginBottom: index < focusItems.length - 1 ? '8px' : '0',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px',
+                  padding: '12px',
+                  backgroundColor: item.completed ? '#F0F9FF' : 'transparent',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'background-color 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  if (!item.completed) {
+                    e.currentTarget.style.backgroundColor = '#F6F7F9';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!item.completed) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
                 }}
               >
-                {item}
-              </li>
+                <CheckCircle
+                  size={24}
+                  style={{
+                    color: item.completed ? '#10B981' : '#D1D5DB',
+                    flexShrink: 0,
+                    marginTop: '2px',
+                  }}
+                  fill={item.completed ? '#10B981' : 'none'}
+                />
+                <div style={{ flex: 1 }}>
+                  <div
+                    style={{
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      color: '#0B162A',
+                      marginBottom: '4px',
+                      textDecoration: item.completed ? 'line-through' : 'none',
+                      opacity: item.completed ? 0.6 : 1,
+                    }}
+                  >
+                    {item.title}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 400,
+                      color: '#0B162A',
+                      opacity: item.completed ? 0.5 : 0.7,
+                      lineHeight: '1.4',
+                    }}
+                  >
+                    {item.description}
+                  </div>
+                </div>
+              </button>
             ))}
-          </ul>
+          </div>
         </div>
 
         {/* Section 4: Progress Bar */}

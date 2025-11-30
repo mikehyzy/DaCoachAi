@@ -1,4 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 import { ProgressBar } from './ProgressBar';
 import { LessonCard } from './LessonCard';
 import { LockedLessonCard } from './LockedLessonCard';
@@ -9,27 +10,12 @@ interface TrackDetailProps {
 }
 
 export function TrackDetail({ onBack, onStartLesson }: TrackDetailProps) {
-  const progress = 42;
+  const { currentTrack, setCurrentLesson } = useAppContext();
 
-  const lessons = [
-    {
-      title: "Strategic Decision Frameworks",
-      description: "Learn the mental models used by elite consultants."
-    },
-    {
-      title: "Competitive Analysis Methods",
-      description: "Master techniques for evaluating market landscapes."
-    },
-    {
-      title: "Scenario Planning & Risk",
-      description: "Build strategies that anticipate future challenges."
-    }
-  ];
+  if (!currentTrack) return null;
 
-  const upcomingLessons = [
-    "Long-term Vision Setting",
-    "Strategic Communication Skills"
-  ];
+  const availableLessons = currentTrack.lessons.slice(0, 3);
+  const lockedLessons = ['Long-term Vision Setting', 'Strategic Communication Skills'];
 
   return (
     <div 
@@ -92,7 +78,7 @@ export function TrackDetail({ onBack, onStartLesson }: TrackDetailProps) {
 
         {/* Section 1: Track Title Block */}
         <div className="text-center" style={{ marginBottom: '32px' }}>
-          <h2 
+          <h2
             style={{
               fontSize: '28px',
               fontWeight: 700,
@@ -101,9 +87,9 @@ export function TrackDetail({ onBack, onStartLesson }: TrackDetailProps) {
               lineHeight: '1.2',
             }}
           >
-            Strategy Track
+            {currentTrack.name}
           </h2>
-          <p 
+          <p
             style={{
               fontSize: '16px',
               fontWeight: 500,
@@ -112,7 +98,7 @@ export function TrackDetail({ onBack, onStartLesson }: TrackDetailProps) {
               lineHeight: '1.5',
             }}
           >
-            Develop elite strategic thinking through guided lessons.
+            {currentTrack.description}
           </p>
         </div>
 
@@ -138,7 +124,7 @@ export function TrackDetail({ onBack, onStartLesson }: TrackDetailProps) {
             Progress
           </div>
           
-          <div 
+          <div
             style={{
               width: '100%',
               height: '10px',
@@ -148,9 +134,9 @@ export function TrackDetail({ onBack, onStartLesson }: TrackDetailProps) {
               marginBottom: '12px',
             }}
           >
-            <div 
+            <div
               style={{
-                width: `${progress}%`,
+                width: `${currentTrack.progress}%`,
                 height: '100%',
                 backgroundColor: '#E67E22',
                 borderRadius: '5px',
@@ -158,8 +144,8 @@ export function TrackDetail({ onBack, onStartLesson }: TrackDetailProps) {
               }}
             />
           </div>
-          
-          <div 
+
+          <div
             style={{
               fontSize: '14px',
               fontWeight: 500,
@@ -167,7 +153,7 @@ export function TrackDetail({ onBack, onStartLesson }: TrackDetailProps) {
               opacity: 0.7,
             }}
           >
-            {progress}% complete
+            {currentTrack.progress}% complete
           </div>
         </div>
 
@@ -184,16 +170,19 @@ export function TrackDetail({ onBack, onStartLesson }: TrackDetailProps) {
             Your Lessons
           </h3>
           
-          <div 
+          <div
             className="flex flex-col"
             style={{ gap: '20px' }}
           >
-            {lessons.map((lesson, index) => (
+            {availableLessons.map((lesson) => (
               <LessonCard
-                key={index}
+                key={lesson.id}
                 title={lesson.title}
                 description={lesson.description}
-                onClick={onStartLesson}
+                onClick={() => {
+                  setCurrentLesson(lesson);
+                  onStartLesson();
+                }}
               />
             ))}
           </div>
@@ -212,11 +201,11 @@ export function TrackDetail({ onBack, onStartLesson }: TrackDetailProps) {
             Upcoming Lessons
           </h3>
           
-          <div 
+          <div
             className="flex flex-col"
             style={{ gap: '16px' }}
           >
-            {upcomingLessons.map((lesson, index) => (
+            {lockedLessons.map((lesson, index) => (
               <LockedLessonCard
                 key={index}
                 title={lesson}
@@ -244,7 +233,11 @@ export function TrackDetail({ onBack, onStartLesson }: TrackDetailProps) {
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = '#E67E22';
           }}
-          onClick={onStartLesson}
+          onClick={() => {
+            const nextLesson = availableLessons.find(l => !l.completed) || availableLessons[0];
+            setCurrentLesson(nextLesson);
+            onStartLesson();
+          }}
         >
           Start Next Lesson
         </button>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AppProvider } from './context/AppContext';
 import { OnboardingScreen } from './components/OnboardingScreen';
 import { DailyHuddle } from './components/DailyHuddle';
 import { CoachingMoment } from './components/CoachingMoment';
@@ -13,51 +14,51 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('onboarding');
 
   return (
-    <>
+    <AppProvider>
       {currentScreen === 'onboarding' && (
         <OnboardingScreen onGetStarted={() => setCurrentScreen('dashboard')} />
       )}
-      
+
       {currentScreen === 'dashboard' && (
-        <DailyHuddle 
+        <DailyHuddle
           onLogoClick={() => setCurrentScreen('onboarding')}
           onStartCoaching={() => setCurrentScreen('coaching')}
           onViewTracks={() => setCurrentScreen('track')}
           onViewProgress={() => setCurrentScreen('progress')}
         />
       )}
-      
+
       {currentScreen === 'coaching' && (
-        <CoachingMoment 
+        <CoachingMoment
           onBack={() => setCurrentScreen('dashboard')}
           onNext={() => setCurrentScreen('summary')}
         />
       )}
-      
+
       {currentScreen === 'track' && (
-        <TrackDetail 
+        <TrackDetail
           onBack={() => setCurrentScreen('dashboard')}
           onStartLesson={() => setCurrentScreen('lesson')}
         />
       )}
-      
+
       {currentScreen === 'progress' && (
         <ProgressOverview onBack={() => setCurrentScreen('dashboard')} />
       )}
-      
+
       {currentScreen === 'summary' && (
-        <CoachingSummary 
+        <CoachingSummary
           onReturnToDashboard={() => setCurrentScreen('dashboard')}
           onViewTracks={() => setCurrentScreen('track')}
         />
       )}
-      
+
       {currentScreen === 'lesson' && (
-        <LessonPlayer 
+        <LessonPlayer
           onBack={() => setCurrentScreen('track')}
           onComplete={() => setCurrentScreen('track')}
         />
       )}
-    </>
+    </AppProvider>
   );
 }

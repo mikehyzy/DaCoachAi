@@ -1,19 +1,25 @@
-import { ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 
 interface LessonPlayerProps {
   onBack: () => void;
   onComplete: () => void;
-  lessonTitle?: string;
-  lessonSubtext?: string;
 }
 
-export function LessonPlayer({ 
-  onBack, 
-  onComplete,
-  lessonTitle = "Strategic Decision Frameworks",
-  lessonSubtext = "Master the mental models used by elite consultants"
-}: LessonPlayerProps) {
-  
+export function LessonPlayer({ onBack, onComplete }: LessonPlayerProps) {
+  const { currentLesson, markLessonComplete } = useAppContext();
+  const [showExtendedContent, setShowExtendedContent] = useState(false);
+
+  if (!currentLesson) {
+    return null;
+  }
+
+  const handleComplete = () => {
+    markLessonComplete(currentLesson.id);
+    onComplete();
+  };
+
   return (
     <div 
       className="min-h-screen flex justify-center px-6 py-6 sm:px-4 sm:py-8"
@@ -64,7 +70,7 @@ export function LessonPlayer({
 
         {/* Section 1: Lesson Title Block */}
         <div className="text-center" style={{ marginBottom: '40px' }}>
-          <h2 
+          <h2
             style={{
               fontSize: '24px',
               fontWeight: 700,
@@ -73,9 +79,9 @@ export function LessonPlayer({
               lineHeight: '1.2',
             }}
           >
-            {lessonTitle}
+            {currentLesson.title}
           </h2>
-          <p 
+          <p
             style={{
               fontSize: '16px',
               fontWeight: 500,
@@ -84,21 +90,21 @@ export function LessonPlayer({
               lineHeight: '1.5',
             }}
           >
-            {lessonSubtext}
+            {currentLesson.description}
           </p>
         </div>
 
         {/* Section 2: Content Card */}
-        <div 
+        <div
           style={{
             backgroundColor: '#FFFFFF',
             borderRadius: '20px',
             padding: '24px',
             boxShadow: '0 4px 12px rgba(11, 22, 42, 0.06), 0 2px 4px rgba(11, 22, 42, 0.04)',
-            marginBottom: '40px',
+            marginBottom: '20px',
           }}
         >
-          <h3 
+          <h3
             style={{
               fontSize: '18px',
               fontWeight: 700,
@@ -108,37 +114,83 @@ export function LessonPlayer({
           >
             Lesson Content
           </h3>
-          
-          <div 
+
+          <div
             style={{
               fontSize: '16px',
               fontWeight: 400,
               color: '#0B162A',
               lineHeight: '1.7',
+              whiteSpace: 'pre-line',
             }}
           >
-            <p style={{ marginBottom: '16px' }}>
-              Strategic decision-making is the cornerstone of effective leadership. The best consultants and executives use proven mental models to evaluate complex situations and make high-impact choices consistently.
-            </p>
-            
-            <p style={{ marginBottom: '16px' }}>
-              In this lesson, you'll learn three core frameworks: First Principles Thinking, which helps you break down problems to their fundamental truths. Second, the Eisenhower Matrix for prioritizing tasks based on urgency and importance. Third, the OODA Loop (Observe, Orient, Decide, Act) for rapid decision cycles in dynamic environments.
-            </p>
-            
-            <p style={{ marginBottom: '16px' }}>
-              These frameworks are not theoretical—they're battle-tested tools used by top-tier strategists across industries. When you internalize these models, you'll approach decisions with clarity, speed, and confidence.
-            </p>
-            
-            <p style={{ marginBottom: '0' }}>
-              Practice applying each framework to a real challenge you're facing this week. Document your thinking process, and notice how structured approaches lead to better outcomes. Mastery comes from repeated application, not just understanding the concept.
-            </p>
+            {currentLesson.content}
           </div>
+
+          {currentLesson.extendedContent && (
+            <>
+              {showExtendedContent && (
+                <div
+                  style={{
+                    fontSize: '16px',
+                    fontWeight: 400,
+                    color: '#0B162A',
+                    lineHeight: '1.7',
+                    whiteSpace: 'pre-line',
+                    marginTop: '20px',
+                    paddingTop: '20px',
+                    borderTop: '1px solid rgba(11, 22, 42, 0.1)',
+                  }}
+                >
+                  {currentLesson.extendedContent}
+                </div>
+              )}
+
+              <button
+                onClick={() => setShowExtendedContent(!showExtendedContent)}
+                className="w-full transition-all"
+                style={{
+                  marginTop: '20px',
+                  padding: '12px 20px',
+                  backgroundColor: '#F6F7F9',
+                  border: '1px solid rgba(11, 22, 42, 0.1)',
+                  borderRadius: '12px',
+                  color: '#E67E22',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#EDEEF0';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#F6F7F9';
+                }}
+              >
+                {showExtendedContent ? (
+                  <>
+                    Show Less
+                    <ChevronUp size={20} />
+                  </>
+                ) : (
+                  <>
+                    Learn More
+                    <ChevronDown size={20} />
+                  </>
+                )}
+              </button>
+            </>
+          )}
         </div>
 
         {/* Section 3: Actions */}
         <div className="flex flex-col items-center">
           <button
-            onClick={onComplete}
+            onClick={handleComplete}
             className="w-full transition-all"
             style={{
               height: '56px',

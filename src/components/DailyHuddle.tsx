@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useAppContext } from '../context/AppContext';
 import { DitkaLogoSmall } from './DitkaLogoSmall';
 import { EnergyGauge } from './EnergyGauge';
 import { FocusCard } from './FocusCard';
-import { Target, Cpu, TrendingUp } from 'lucide-react';
+import { Target, Cpu, TrendingUp, Clock } from 'lucide-react';
 
 interface DailyHuddleProps {
   onLogoClick: () => void;
@@ -12,6 +12,7 @@ interface DailyHuddleProps {
 }
 
 export function DailyHuddle({ onLogoClick, onStartCoaching, onViewTracks, onViewProgress }: DailyHuddleProps) {
+  const { userDay } = useAppContext();
   return (
     <div 
       className="min-h-screen flex justify-center px-6 py-6 sm:px-4 sm:py-8"
@@ -67,7 +68,7 @@ export function DailyHuddle({ onLogoClick, onStartCoaching, onViewTracks, onView
             marginBottom: '40px',
           }}
         >
-          <h1 
+          <h1
             style={{
               fontSize: '24px',
               fontWeight: 700,
@@ -77,12 +78,31 @@ export function DailyHuddle({ onLogoClick, onStartCoaching, onViewTracks, onView
           >
             Today's Game Plan
           </h1>
-          
+
           <div style={{ marginBottom: '20px' }}>
-            <EnergyGauge level="High" percentage={85} isLoading={false} />
+            <EnergyGauge level={userDay.energyLevel} percentage={userDay.energyPercentage} isLoading={false} />
           </div>
-          
-          <p 
+
+          <div
+            className="flex items-center justify-center"
+            style={{
+              marginBottom: '12px',
+              gap: '8px',
+            }}
+          >
+            <Clock size={18} style={{ color: '#E67E22' }} />
+            <span
+              style={{
+                fontSize: '16px',
+                fontWeight: 600,
+                color: '#E67E22',
+              }}
+            >
+              {userDay.availableMinutes} minutes available
+            </span>
+          </div>
+
+          <p
             style={{
               fontSize: '16px',
               fontWeight: 400,
