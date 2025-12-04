@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AppProvider } from './context/AppContext';
 import { OnboardingScreen } from './components/OnboardingScreen';
 import { DailyHuddle } from './components/DailyHuddle';
+import { TracksHub } from './components/TracksHub';
 import { CoachingMoment } from './components/CoachingMoment';
 import { TrackDetail } from './components/TrackDetail';
 import { ProgressOverview } from './components/ProgressOverview';
@@ -11,11 +12,13 @@ import { ScenarioCreator } from './components/ScenarioCreator';
 import { DailyReflection, DailyReflectionResults as DailyReflectionResultsType } from './components/DailyReflection';
 import { DailyReflectionResults } from './components/DailyReflectionResults';
 
-type Screen = 'onboarding' | 'dashboard' | 'dailyReflection' | 'dailyReflectionResults' | 'coaching' | 'track' | 'progress' | 'summary' | 'lesson' | 'scenario';
+type Screen = 'onboarding' | 'dashboard' | 'tracksHub' | 'dailyReflection' | 'dailyReflectionResults' | 'coaching' | 'track' | 'progress' | 'summary' | 'lesson' | 'scenario';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('onboarding');
   const [reflectionResults, setReflectionResults] = useState<DailyReflectionResultsType | null>(null);
+  const [selectedTrack, setSelectedTrack] = useState<string>('');
+  const [selectedLesson, setSelectedLesson] = useState<string>('');
 
   return (
     <AppProvider>
@@ -26,11 +29,27 @@ export default function App() {
       {currentScreen === 'dashboard' && (
         <DailyHuddle
           onLogoClick={() => setCurrentScreen('onboarding')}
-          onStartCoaching={() => setCurrentScreen('coaching')}
-          onViewTracks={() => setCurrentScreen('track')}
-          onViewProgress={() => setCurrentScreen('progress')}
-          onCreateScenario={() => setCurrentScreen('scenario')}
-          onDailyReflection={() => setCurrentScreen('dailyReflection')}
+          onViewTracks={() => setCurrentScreen('tracksHub')}
+          onDrillSelect={(track, lesson) => {
+            setSelectedTrack(track);
+            setSelectedLesson(lesson);
+            setCurrentScreen('lesson');
+          }}
+        />
+      )}
+
+      {currentScreen === 'tracksHub' && (
+        <TracksHub
+          onBack={() => setCurrentScreen('dashboard')}
+          onLessonSelect={(track, lesson) => {
+            setSelectedTrack(track);
+            setSelectedLesson(lesson);
+            setCurrentScreen('lesson');
+          }}
+          onTrackSelect={(track) => {
+            setSelectedTrack(track);
+            setCurrentScreen('track');
+          }}
         />
       )}
 
@@ -60,7 +79,7 @@ export default function App() {
 
       {currentScreen === 'track' && (
         <TrackDetail
-          onBack={() => setCurrentScreen('dashboard')}
+          onBack={() => setCurrentScreen('tracksHub')}
           onStartLesson={() => setCurrentScreen('lesson')}
         />
       )}
@@ -72,14 +91,14 @@ export default function App() {
       {currentScreen === 'summary' && (
         <CoachingSummary
           onReturnToDashboard={() => setCurrentScreen('dashboard')}
-          onViewTracks={() => setCurrentScreen('track')}
+          onViewTracks={() => setCurrentScreen('tracksHub')}
         />
       )}
 
       {currentScreen === 'lesson' && (
         <LessonPlayer
-          onBack={() => setCurrentScreen('track')}
-          onComplete={() => setCurrentScreen('track')}
+          onBack={() => setCurrentScreen('tracksHub')}
+          onComplete={() => setCurrentScreen('tracksHub')}
         />
       )}
 
