@@ -8,11 +8,10 @@ import { ProgressOverview } from './components/ProgressOverview';
 import { CoachingSummary } from './components/CoachingSummary';
 import { LessonPlayer } from './components/LessonPlayer';
 import { ScenarioCreator } from './components/ScenarioCreator';
-import { Dashboard } from './components/Dashboard';
 import { DailyReflection, DailyReflectionResults as DailyReflectionResultsType } from './components/DailyReflection';
 import { DailyReflectionResults } from './components/DailyReflectionResults';
 
-type Screen = 'onboarding' | 'home' | 'dashboard' | 'dailyReflection' | 'dailyReflectionResults' | 'coaching' | 'track' | 'progress' | 'summary' | 'lesson' | 'scenario';
+type Screen = 'onboarding' | 'dashboard' | 'dailyReflection' | 'dailyReflectionResults' | 'coaching' | 'track' | 'progress' | 'summary' | 'lesson' | 'scenario';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('onboarding');
@@ -21,20 +20,23 @@ export default function App() {
   return (
     <AppProvider>
       {currentScreen === 'onboarding' && (
-        <OnboardingScreen onGetStarted={() => setCurrentScreen('home')} />
+        <OnboardingScreen onGetStarted={() => setCurrentScreen('dashboard')} />
       )}
 
-      {currentScreen === 'home' && (
-        <Dashboard
-          onBack={() => setCurrentScreen('onboarding')}
+      {currentScreen === 'dashboard' && (
+        <DailyHuddle
+          onLogoClick={() => setCurrentScreen('onboarding')}
+          onStartCoaching={() => setCurrentScreen('coaching')}
+          onViewTracks={() => setCurrentScreen('track')}
+          onViewProgress={() => setCurrentScreen('progress')}
+          onCreateScenario={() => setCurrentScreen('scenario')}
           onDailyReflection={() => setCurrentScreen('dailyReflection')}
-          onScenarioCreation={() => setCurrentScreen('scenario')}
         />
       )}
 
       {currentScreen === 'dailyReflection' && (
         <DailyReflection
-          onBack={() => setCurrentScreen('home')}
+          onBack={() => setCurrentScreen('dashboard')}
           onAnalyzeComplete={(results) => {
             setReflectionResults(results);
             setCurrentScreen('dailyReflectionResults');
@@ -44,18 +46,8 @@ export default function App() {
 
       {currentScreen === 'dailyReflectionResults' && reflectionResults && (
         <DailyReflectionResults
-          onBack={() => setCurrentScreen('home')}
+          onBack={() => setCurrentScreen('dashboard')}
           results={reflectionResults}
-        />
-      )}
-
-      {currentScreen === 'dashboard' && (
-        <DailyHuddle
-          onLogoClick={() => setCurrentScreen('home')}
-          onStartCoaching={() => setCurrentScreen('coaching')}
-          onViewTracks={() => setCurrentScreen('track')}
-          onViewProgress={() => setCurrentScreen('progress')}
-          onCreateScenario={() => setCurrentScreen('scenario')}
         />
       )}
 
